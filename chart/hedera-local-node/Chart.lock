@@ -1,0 +1,15 @@
+dependencies:
+- name: hedera-mirror
+  repository: https://hashgraph.github.io/hedera-mirror-node/charts
+  version: 0.68.1
+- name: hedera-explorer
+  repository: file://../hedera-mirror-node-explorer/
+  version: 0.1.0
+- name: network-node
+  repository: file://../hedera-services/
+  version: 0.1.0
+- name: hedera-json-rpc-relay
+  repository: file://../hedera-json-rpc-relay/
+  version: 0.12.0-SNAPSHOT
+digest: sha256:303b71be4519b5e2dcb8a98ae4bb4ac03ffcd0874dcab97f5d67995ce97e3a9c
+generated: "2022-11-18T20:14:02.286623943+02:00"

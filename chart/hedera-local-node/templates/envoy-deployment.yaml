@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose -v convert
+    kompose.version: 1.26.1 (a9d05d509)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: envoy
+  name: envoy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: envoy
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose -v convert
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/test-network-node-bridge: "true"
+        io.kompose.service: envoy
+    spec:
+      containers:
+        - image: envoyproxy/envoy:v1.22.0
+          name: envoy-proxy
+          ports:
+            - containerPort: 50213
+          resources: {}
+          volumeMounts:
+            - mountPath: /etc/envoy/envoy.yaml
+              name: envoy
+              subPath: envoy
+      restartPolicy: Always
+
+      volumes:
+        - name: envoy
+          configMap:
+            name: envoy-config
+status: {}

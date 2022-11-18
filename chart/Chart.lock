@@ -1,9 +1,0 @@
-dependencies:
-- name: hedera-mirror
-  repository: https://hashgraph.github.io/hedera-mirror-node/charts
-  version: 0.68.0
-- name: hedera-mirror-explorer
-  repository: file://../hedera-mirror-node-explorer/chart
-  version: 0.1.0
-digest: sha256:d6a0bf49a8caeb2b0dfbd06c778595f9cd60db5e4bb0b46fb24b7a770e82f66d
-generated: "2022-11-13T22:02:10.901605083+02:00"

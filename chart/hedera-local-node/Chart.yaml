@@ -25,7 +25,14 @@ appVersion: "1.16.0"
 dependencies:
   - name: hedera-mirror
     repository: https://hashgraph.github.io/hedera-mirror-node/charts
+    #repository: file://../hedera-mirror-node/hedera-mirror
     version: ">=0.68"
-  - name: hedera-mirror-explorer
-    repository: file://./hedera-mirror-node-explorer/
+  - name: hedera-explorer
+    repository: file://../hedera-mirror-node-explorer/
     version: ">=0.1"
+  - name: network-node
+    repository: file://../hedera-services/
+    version: ">=0.1"
+  - name: hedera-json-rpc-relay
+    repository: file://../hedera-json-rpc-relay/
+    version: ">=0.1-SNAPSHOT"

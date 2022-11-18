@@ -1,0 +1,246 @@
+hedera-mirror:
+  importer:
+    image:
+      pullPolicy: Always
+      registry: docker.io
+      repository: cabob/hedera-mirror-importer
+      tag: "latest"
+    resources:
+      limits:
+        cpu: 1
+        memory: 4Gi
+      requests:
+        cpu: 200m
+        memory: 512Mi
+
+    addressBook: CvQGCgozNC43MC4xMC4zOBoFMC4wLjMizAYzMDgyMDFhMjMwMGQwNjA5MmE4NjQ4ODZmNzBkMDEwMTAxMDUwMDAzODIwMThmMDAzMDgyMDE4YTAyODIwMTgxMDBhMTIwMDZmMjUyNzI0MmNkN2Y1M2I5YzRmZDVkZTg2OWM1NjJmZjRlZDhhNGFiM2E2Mjk2M2YzZjgxODhiZTc4ZjI1OGVhZjQyYjljM2UzZThmNTg2OTcxNjA0MTNiYmY3N2FhZGZhZjBkOWZmZDg2OTg0YjNiYzRmYjVmMDJlMTFlOGFjYjZlYzY3ZTQyNjRhZGRjYTEzZmZkZTgzNjc1NzhjMjc5MmZjNmFlMzI2ZTdiMzQ4NTZkMjNmMDI1NzRmNWEyNzQ4MTU2MDAzMmQ3Mzc0OWRhZjlkMzMyYTc4ODM1MTBlNjBlYTIyMjg4OWEzYmZjM2JlZGYzNTBmM2EzNmNhZGEzOWI5NDUzOWM3NGZiODI2NTY3OGJkNWMxNDhmYmM5MTY5YWRjYWNmNjcxOWI5MmVlOGQ0MmE5ZDJmODkyM2NjNGZlM2I0OTRjNDY3ZjRlOThhMmE0OWUwYTBlZjVhYTQzM2NiZWM0MzhiYWEyNTZhZTYxYTA1OTBjZTRlNjdkMGIzZmU1ZjJkYTlhZDkwYzI2ZTIyOWQyOGQ2Nzk0NTY5NzhkNjU3MzU3M2ViYjQ2MjM5YmFkNGFiZmFiNGZmZTY0ZWE0YTM5N2M2YmM1ZjcxNzVlMWFjMzY0ODhmMTdjNjc3M2I1ZWQ5MzQxNWU1N2M0MWM2Y2Q4ODY2ZGJkMTIzNjAwNjIzMzljYjE1NGQ4NWFkMWFlY2QxZDc2MGEwOTQxZDgwZTI4ZmUyNDYwMzNhODY4ZGJiYzg5NzVmMzYwNDQzMWZjZTlhZjkxZGM0MjU0MGFiMDRiMWJiZWMyMWYzNWY3NWYzMGFmNmYwNWM4OTg2NDI5Mzg2ZTJiNDM5YmZkMmZkNTkxMmM4MjYwMDgwMWU5YzA4NTdmMTY1ZTg4N2YyMjMzZGMyYzA5OGJhMTI2N2IwNTlkYjhhMmRiNzE0ZmU1MDY2OGRiZjA5MzYwNGE1ZGYzYzIzMjE0NjcyMzIxMWNlNTg1NTI2MzhmYWU5ZmMwNjRhN2YwOWIwMjAzMDEwMDAxMgIYA0IKCgSsGwADEL+HA1AB
+    env:
+      SPRING_CONFIG_ADDITIONAL_LOCATION: file:/usr/etc/hedera-mirror-importer/
+    volumes:
+      config:
+        secret:
+          secretName: app-config
+      abook:
+        secret:
+          secretName: abook-config
+
+    volumeMounts:
+      abook:
+        mountPath: /usr/etc/hedera-mirror-importer/local-dev-1-node.addressbook.f102.json.bin
+        subPath: addressBook.bin
+    config:
+      hedera:
+        mirror:
+          importer:
+            parser:
+              record:
+                entity:
+                  redis:
+                    enabled: false
+                sidecar:
+                  enabled: false
+            downloader:
+              accessKey: minioadmin
+              cloudProvider: "S3"
+              secretKey: minioadmin
+              bucketName: hedera-streams
+              endpointOverride: http://minio:9000
+            initialAddressBook: "/usr/etc/hedera-mirror-importer/local-dev-1-node.addressbook.f102.json.bin"
+            network: OTHER
+      # config:
+      #   mountPath: /usr/etc/hedera-mirror-importer/application.yml
+      #   subPath: application.yaml
+
+  grpc:
+    volumes:
+      config:
+        secret:
+          secretName: app-config
+    image:
+      pullPolicy: IfNotPresent
+      registry: docker.io
+      repository: cabob/hedera-mirror-grpc
+      tag: "latest"
+
+  rest:
+    image:
+      pullPolicy: IfNotPresent
+      registry: docker.io
+      repository: cabob/hedera-mirror-rest
+      tag: "latest"
+
+  web3:
+    image:
+      pullPolicy: IfNotPresent
+      registry: docker.io
+      repository: cabob/hedera-mirror-web3
+      tag: "latest"
+
+  rosetta:
+    image:
+      pullPolicy: IfNotPresent
+      registry: docker.io
+      repository: cabob/hedera-mirror-rosetta
+      tag: "latest"
+
+  monitor:
+    image:
+      pullPolicy: IfNotPresent
+      registry: docker.io
+      repository: cabob/hedera-mirror-monitor
+      tag: "latest"
+
+  hedera-mirror-rest:
+    fullnameOverride: "mirror-node-rest"
+    image:
+      pullPolicy: IfNotPresent
+      registry: docker.io/
+      repository: cabob/hedera-mirror-rest
+      tag: "latest"
+  postgresql:
+    pgpool:
+      reservedConnections: 0
+    postgresql:
+      maxConnections: 1000
+
+hedera-json-rpc-relay:
+  LOG_LEVEL: "1"
+  service:
+    type: LoadBalancer
+    loadBalancerIP: "34.70.10.38"
+  image:
+    repository: cabob/hedera-json-rpc-relay
+    pullPolicy: Always
+    # Overrides the image tag whose default is the chart appVersion.
+    tag: "latest"
+  config:
+    # This value should be in decimal, not hexadecimal format.
+
+    LOG_LEVEL: "1"
+    # Use config.local.HEDERA_NETWORK when running against a locally hosted hedera network
+    local:
+      #   config.local.HEDERA_NETWORK should configured as a json set - {"$IPv4_ADDR_1:$PORT_1":"$ACCOUNT_ID_1","$IPv4_ADDR_2:$PORT_2":"$ACCOUNT_ID_2"}
+      HEDERA_NETWORK: '{ "network-2node:50211": "0.0.3" }'
+    #   HEDERA_NETWORK: ""
+    # Use config.hosted.HEDERA_NETWORK when running against a hosted Hedera network.  Valid options are `previewnet`, `testnet`, and `mainnet`
+    hosted:
+      HEDERA_NETWORK: "testnet"
+    OPERATOR_ID_ETH_SENDRAWTRANSACTION: ""
+    OPERATOR_ID_MAIN: 0.0.2
+    OPERATOR_KEY_MAIN: 302e020100300506032b65700422042091132178e72057a1d7528025956fe39b0b847f200ab59b2fdd367017f3087137
+    CHAIN_ID: "0x12a"
+    MIRROR_NODE_URL: http://mirror-1-rest
+    LOCAL_NODE: TRUE
+    SERVER_PORT: "7546"
+    E2E_RELAY_HOST: http://127.0.0.1:7546
+    FEE_HISTORY_MAX_RESULTS: 10
+    DEFAULT_RATE_LIMIT: 200
+    TIER_1_RATE_LIMIT: 100
+    TIER_2_RATE_LIMIT: 800
+    TIER_3_RATE_LIMIT: 1600
+    LIMIT_DURATION: 60000
+    HBAR_RATE_LIMIT_TINYBAR: 8000000000
+    HBAR_RATE_LIMIT_DURATION: 60000
+    ETH_GET_LOGS_BLOCK_RANGE_LIMIT: 2000
+    GAS_PRICE_TINY_BAR_BUFFER: 10000000000
+hedera-explorer:
+  service:
+    type: LoadBalancer
+    loadBalancerIP: "34.70.10.38"
+#   volumeMounts:
+#     - mountPath: /var/run
+#       name: tmpfs-1
+#     - mountPath: /var/cache/nginx
+#       name: tmpfs-2
+#   volumes:
+#     - name: tmpfs-1
+#       emptyDir: {}
+#     - name: tmpfs-2
+#       emptyDir: {}
+
+# Default values for hedera-mirror-node.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: nginx
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  {}
+  # fsGroup: 2000
+
+securityContext:
+  {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations:
+    {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources:
+  {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

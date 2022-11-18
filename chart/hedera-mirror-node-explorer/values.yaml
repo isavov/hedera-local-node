@@ -43,11 +43,11 @@ global:
   namespaceOverride: ""
 
 image:
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
   pullSecrets: []
   registry: docker.io
-  repository: ssheehy/hedera-explorer
-  tag: latest  # Defaults to the chart's app version
+  repository: cabob/hedera-explorer
+  tag: latest # Defaults to the chart's app version
 
 ingress:
   annotations: {}
@@ -118,7 +118,7 @@ securityContext:
 
 service:
   annotations: {}
-  port: 80
+  port: 8080
   type: ClusterIP
 
 serviceAccount:
@@ -145,4 +145,3 @@ volumeMounts:
 volumes:
   cache:
     emptyDir: {}
-
