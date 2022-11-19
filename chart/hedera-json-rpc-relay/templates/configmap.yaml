@@ -1,0 +1,29 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "json-rpc-relay.fullname" . }}
+  labels:
+    app:  {{ template "json-rpc-relay.name" . }}
+    {{ include "json-rpc-relay.labels" . | nindent 4 }}
+data:
+{{- if and .Values.config.local .Values.config.local.HEDERA_NETWORK }}
+  HEDERA_NETWORK: {{ .Values.config.local.HEDERA_NETWORK | toJson }}
+{{- else if .Values.config.hosted.HEDERA_NETWORK }}
+  HEDERA_NETWORK: {{ .Values.config.hosted.HEDERA_NETWORK }}
+{{- else }}
+  HEDERA_NETWORK: {{ required "A valid HEDERA_NETWORK must be present in either .Values.config.local.HEDERA_NETWORK or .Values.config.hosted.HEDERA_NETWORK " (or .Values.config.local.HEDERA_NETWORK .Values.config.hosted.HEDERA_NETWORK) }}
+{{- end }}
+  MIRROR_NODE_URL: {{ .Values.config.MIRROR_NODE_URL  }}
+  LOCAL_NODE: {{ .Values.config.LOCAL_NODE | quote }}
+  SERVER_PORT: {{ .Values.config.SERVER_PORT |quote }}
+  CHAIN_ID: {{ .Values.config.CHAIN_ID | squote  }}
+  DEFAULT_RATE_LIMIT: {{ .Values.config.DEFAULT_RATE_LIMIT | quote }}
+  TIER_1_RATE_LIMIT: {{ .Values.config.TIER_1_RATE_LIMIT | quote }}
+  TIER_2_RATE_LIMIT: {{ .Values.config.TIER_2_RATE_LIMIT | quote }}
+  TIER_3_RATE_LIMIT: {{ .Values.config.TIER_3_RATE_LIMIT | quote }}
+  LIMIT_DURATION: {{ .Values.config.LIMIT_DURATION | quote  }}
+  HBAR_RATE_LIMIT_TINYBAR: {{ .Values.config.HBAR_RATE_LIMIT_TINYBAR | quote }}
+  HBAR_RATE_LIMIT_DURATION: {{ .Values.config.HBAR_RATE_LIMIT_DURATION | quote }}
+  ETH_GET_LOGS_BLOCK_RANGE_LIMIT: {{ .Values.config.ETH_GET_LOGS_BLOCK_RANGE_LIMIT | quote }}
+  RATE_LIMIT_DISABLED: {{ .Values.config.RATE_LIMIT_DISABLED | quote }}
+  DEV_MODE: {{ .Values.config.DEV_MODE | quote }}
