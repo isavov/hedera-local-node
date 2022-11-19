@@ -2,14 +2,14 @@
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "hedera-mirror-node.fullname" . }}
+  name: {{ include "hedera-services.fullname" . }}
   labels:
-    {{- include "hedera-mirror-node.labels" . | nindent 4 }}
+    {{- include "hedera-services.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "hedera-mirror-node.fullname" . }}
+    name: {{ include "hedera-services.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:

@@ -1,5 +1,5 @@
 apiVersion: v2
-name: hedera-local-node
+name: network-node
 description: A Helm chart for Kubernetes
 
 # A chart can be either an 'application' or a 'library' chart.
@@ -22,19 +22,3 @@ version: 0.1.0
 # follow Semantic Versioning. They should reflect the version the application is using.
 # It is recommended to use it with quotes.
 appVersion: "1.16.0"
-dependencies:
-  - name: hedera-mirror
-    repository: https://hashgraph.github.io/hedera-mirror-node/charts
-    #repository: file://../hedera-mirror-node/hedera-mirror
-    version: ">=0.68"
-  - name: hedera-explorer
-    #coppied from https://github.com/hashgraph/hedera-mirror-node-explorer/tree/282-helm-chart and updated
-    repository: file://../hedera-mirror-node-explorer/
-    version: ">=0.1"
-  - name: network-node
-    repository: file://../hedera-services/
-    version: ">=0.1"
-  - name: hedera-json-rpc-relay
-    #copied from https://github.com/isavov/hedera-json-rpc-relay
-    repository: file://../hedera-json-rpc-relay/
-    version: ">=0.1-SNAPSHOT"

@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose -v convert -c
+    kompose.version: 1.26.1 (a9d05d509)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: haveged
+  name: haveged
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: haveged
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: kompose -v convert -c
+        kompose.version: 1.26.1 (a9d05d509)
+      creationTimestamp: null
+      labels:
+        io.kompose.service: haveged
+    spec:
+      containers:
+        - image: gcr.io/hedera-registry/network-node-haveged:0.32.0-alpha.1
+          name: haveged
+          resources: {}
+          securityContext:
+            privileged: true
+      restartPolicy: Always
+status: {}

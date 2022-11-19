@@ -57,35 +57,35 @@ hedera-mirror:
         secret:
           secretName: app-config
     image:
-      pullPolicy: IfNotPresent
+      pullPolicy: Always
       registry: docker.io
       repository: cabob/hedera-mirror-grpc
       tag: "latest"
 
   rest:
     image:
-      pullPolicy: IfNotPresent
+      pullPolicy: Always
       registry: docker.io
       repository: cabob/hedera-mirror-rest
       tag: "latest"
 
   web3:
     image:
-      pullPolicy: IfNotPresent
+      pullPolicy: Always
       registry: docker.io
       repository: cabob/hedera-mirror-web3
       tag: "latest"
 
   rosetta:
     image:
-      pullPolicy: IfNotPresent
+      pullPolicy: Always
       registry: docker.io
       repository: cabob/hedera-mirror-rosetta
       tag: "latest"
 
   monitor:
     image:
-      pullPolicy: IfNotPresent
+      pullPolicy: Always
       registry: docker.io
       repository: cabob/hedera-mirror-monitor
       tag: "latest"
@@ -93,7 +93,7 @@ hedera-mirror:
   hedera-mirror-rest:
     fullnameOverride: "mirror-node-rest"
     image:
-      pullPolicy: IfNotPresent
+      pullPolicy: Always
       registry: docker.io/
       repository: cabob/hedera-mirror-rest
       tag: "latest"

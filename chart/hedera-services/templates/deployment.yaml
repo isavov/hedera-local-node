@@ -1,0 +1,248 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "hedera-services.fullname" . }}
+  labels:
+    {{- include "hedera-services.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "hedera-services.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "hedera-services.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "hedera-services.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      hostname: network-node
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          env:
+            {{- range $name, $value := .Values.env }}
+            - name: {{ $name }}
+            {{- if kindIs "string" $value }}
+              value: {{ tpl $value $ | quote }}
+            {{- else }}
+            {{- tpl (toYaml $value) $ | nindent 14 }}
+            {{- end }}
+            {{- end }}
+          envFrom: {{ tpl (toYaml .Values.envFrom) . | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          command: ["/bin/sh", "-c", "cp -r config-mount/* .;  ./start-services.sh;hostname"]
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
+            {{- range $name, $config := . }}
+            - name: {{ $name }}
+            {{- toYaml $config | nindent 14 }}
+            {{- end }}
+          {{- end }}
+          # {{ range $path, $bytes := .Files.Glob ( printf "compose-network/network-node/data/config/**") }}
+          # {{ $name := base $path }}
+          #   - name: application-config-path
+          #     mountPath: {{ printf "/opt/hedera/services/config-mount%s/%s" (index (regexSplit "compose-network/network-node/data/config" (dir $path) -1) 1) $name | indent 2 }}
+          #     subPath: {{- sha256sum (printf "%s/%s" (index (regexSplit "compose-network/network-node/data/config" (dir $path) -1) 1 ) $name ) | indent 2 }}
+          # {{ end }}
+          {{ range $path, $bytes := .Files.Glob ( printf "compose-network/network-node/**") }}
+          {{ $name := base $path }}
+            - name: application-root-path
+              mountPath: {{ printf "/opt/hedera/services/config-mount%s/%s" (index (regexSplit "compose-network/network-node" (dir $path) -1) 1) $name | indent 2 }}
+              subPath: {{- sha256sum (printf "%s/%s" (index (regexSplit "compose-network/network-node" (dir $path) -1) 1 ) $name ) | indent 2 }}
+          {{ end }}
+          ports:
+            - containerPort: 50211
+            - containerPort: 50212
+
+
+          livenessProbe:
+             exec:
+               command: ["grep", "ServicesMain - Now current platform status = ACTIVE", "/opt/hedera/services/output/hgcaa.log"]
+             initialDelaySeconds: 60
+          #     port: endpoint
+          # # readinessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: endpoint
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+
+
+
+        - name: record-streams-uploader
+        
+          args:
+            - /usr/bin/env
+            - python3.7
+            - /usr/local/bin/mirror.py
+            - --linux
+            - --watch-directory
+            - /records
+            - --s3-endpoint
+            - http://minio:9000
+            - --debug
+          env:
+            - name: BUCKET_NAME
+              value: hedera-streams
+            - name: BUCKET_PATH
+              value: recordstreams/record0.0.3
+            - name: DEBUG
+              value: "true"
+            - name: GCS_ENABLE
+              value: "false"
+            - name: REAPER_ENABLE
+              value: "true"
+            - name: REAPER_INTERVAL
+              value: "5"
+            - name: REAPER_MIN_KEEP
+              value: "1"
+            - name: S3_ACCESS_KEY
+              value: minioadmin
+            - name: S3_ENABLE
+              value: "true"
+            - name: S3_SECRET_KEY
+              value: minioadmin
+            - name: SIG_EXTENSION
+              value: rcd_sig
+            - name: SIG_PRIORITIZE
+              value: "true"
+            - name: SIG_REQUIRE
+              value: "true"
+            - name: STREAM_EXTENSION
+              value: rcd.gz
+          image: gcr.io/hedera-registry/uploader-mirror:0.7.0
+          resources: {}
+          volumeMounts:
+            - name: network-node-logs-root-path
+              mountPath: /records
+              subPath: recordStreams/record0.0.3
+          
+        - name: account-balances-uploader
+          args:
+            - /usr/bin/env
+            - python3.7
+            - /usr/local/bin/mirror.py
+            - --linux
+            - --watch-directory
+            - /balances
+            - --s3-endpoint
+            - http://minio:9000
+            - --debug
+          env:
+            - name: BUCKET_NAME
+              value: hedera-streams
+            - name: BUCKET_PATH
+              value: accountBalances/balance0.0.3
+            - name: DEBUG
+              value: "true"
+            - name: GCS_ENABLE
+              value: "false"
+            - name: REAPER_ENABLE
+              value: "true"
+            - name: REAPER_INTERVAL
+              value: "5"
+            - name: REAPER_MIN_KEEP
+              value: "1"
+            - name: S3_ACCESS_KEY
+              value: minioadmin
+            - name: S3_ENABLE
+              value: "true"
+            - name: S3_SECRET_KEY
+              value: minioadmin
+            - name: SIG_EXTENSION
+              value: pb_sig
+            - name: SIG_PRIORITIZE
+              value: "true"
+            - name: SIG_REQUIRE
+              value: "true"
+            - name: STREAM_EXTENSION
+              value: pb
+          image: gcr.io/hedera-registry/uploader-mirror:0.7.0
+          resources: {}
+          volumeMounts:
+            - name: network-node-logs-root-path
+              mountPath: /balances
+              subPath: accountBalances/balance0.0.3
+              
+
+        - name: record-sidecar-uploader
+          args:
+            - /usr/bin/env
+            - python3.7
+            - /usr/local/bin/mirror.py
+            - --linux
+            - --watch-directory
+            - /sidecar-files
+            - --s3-endpoint
+            - http://minio:9000
+            - --debug
+          env:
+            - name: BUCKET_NAME
+              value: hedera-streams
+            - name: BUCKET_PATH
+              value: recordstreams/record0.0.3/sidecar
+            - name: DEBUG
+              value: "true"
+            - name: GCS_ENABLE
+              value: "false"
+            - name: REAPER_ENABLE
+              value: "true"
+            - name: REAPER_INTERVAL
+              value: "5"
+            - name: REAPER_MIN_KEEP
+              value: "1"
+            - name: S3_ACCESS_KEY
+              value: minioadmin
+            - name: S3_ENABLE
+              value: "true"
+            - name: S3_SECRET_KEY
+              value: minioadmin
+            - name: SIG_PRIORITIZE
+              value: "false"
+            - name: SIG_REQUIRE
+              value: "false"
+            - name: STREAM_EXTENSION
+              value: rcd.gz
+          image: gcr.io/hedera-registry/uploader-mirror:0.7.0
+
+          resources: {}
+          volumeMounts:
+            - name: network-node-logs-root-path
+              mountPath: /sidecar-files
+              subPath: recordStreams/record0.0.3/sidecar
+
+
+
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.volumes }}
+      volumes:
+        {{- range $name, $config := . }}
+        - name: {{ $name }}
+        {{- tpl (toYaml $config) $ | nindent 10 }}
+        {{- end }}
+      {{- end }}

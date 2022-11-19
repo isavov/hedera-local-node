@@ -1,0 +1,147 @@
+# Default values for hedera-services.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: "cabob/hedera-services"
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+env:
+  JAVA_HEAP_MIN: 256m
+  JAVA_HEAP_MAX: 2g
+  JAVA_OPTS: "-XX:+UnlockExperimentalVMOptions -XX:+UseZGC -Xlog:gc*:gc.log"
+
+envFrom: []
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  {}
+  # fsGroup: 2000
+
+securityContext:
+  allowPrivilegeEscalation: false
+  runAsUser: 0
+  #{}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: LoadBalancer
+  port: 50211
+  loadBalancerIP: "34.70.10.38"
+ingress:
+  enabled: false
+  className: ""
+  annotations:
+    {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources:
+  {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+# Volumes to add to the container. The key is the volume name and the value is the volume mount definition. The same keys should also appear in volumes below.
+volumeMounts:
+  - name: network-node-logs-root-path
+    mountPath: /opt/hgcapp/accountBalances
+    subPath: accountBalances
+  - name: network-node-logs-root-path
+    mountPath: /opt/hgcapp/recordStreams
+    subPath: recordStreams
+  - name: network-node-logs-root-path
+    mountPath: /opt/hedera/services/services/output
+    subPath: logs
+  # - name: application-root-path
+  #   mountPath: /opt/hedera/services/data/keys
+  #   subPath: data/keys
+  # - name: application-root-path
+  #   mountPath: /opt/hedera/services/data/onboard
+  #   subPath: data/onboard
+  # - name: network-node-logs-root-path
+  #   mountPath: /opt/hedera/services/data/stats
+  #   subPath: stats
+  # - name: application-root-path
+  #   mountPath: /opt/hedera/services/config.txt
+  #   subPath: config.txt
+  # - name: application-root-path
+  #   mountPath: /opt/hedera/services/settings.txt
+  #   subPath: settings.txt
+  # - name: application-root-path
+  #   mountPath: /opt/hedera/services/log4j2.xml
+  #   subPath: log4j2.xml
+  # - name: application-root-path
+  #   mountPath: /opt/hedera/services/hedera.crt
+  #   subPath: hedera.crt
+  # - name: application-root-path
+  #   mountPath: /opt/hedera/services/hedera.key
+  #   subPath: hedera.key
+
+# Volume mounts to add to the container. The key is the volume name and the value is the volume definition. Evaluated as a template.
+volumes:
+  application-config-path:
+    configMap:
+      name: application-config
+
+  application-root-path:
+    configMap:
+      name: application-root
+
+  network-node-logs-root-path:
+    persistentVolumeClaim:
+      claimName: node-logs
+  data-empty:
+    emptyDir: {}

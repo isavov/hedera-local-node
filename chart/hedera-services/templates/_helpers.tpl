@@ -1,7 +1,7 @@
 {{/*
 Expand the name of the chart.
 */}}
-{{- define "hedera-mirror-node.name" -}}
+{{- define "hedera-services.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
@@ -10,7 +10,7 @@ Create a default fully qualified app name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
-{{- define "hedera-mirror-node.fullname" -}}
+{{- define "hedera-services.fullname" -}}
 {{- if .Values.fullnameOverride }}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" }}
 {{- else }}
@@ -26,16 +26,16 @@ If release name contains chart name it will be used as a full name.
 {{/*
 Create chart name and version as used by the chart label.
 */}}
-{{- define "hedera-mirror-node.chart" -}}
+{{- define "hedera-services.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
 Common labels
 */}}
-{{- define "hedera-mirror-node.labels" -}}
-helm.sh/chart: {{ include "hedera-mirror-node.chart" . }}
-{{ include "hedera-mirror-node.selectorLabels" . }}
+{{- define "hedera-services.labels" -}}
+helm.sh/chart: {{ include "hedera-services.chart" . }}
+{{ include "hedera-services.selectorLabels" . }}
 {{- if .Chart.AppVersion }}
 app.kubernetes.io/version: {{ .Chart.AppVersion | quote }}
 {{- end }}
@@ -45,17 +45,17 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{/*
 Selector labels
 */}}
-{{- define "hedera-mirror-node.selectorLabels" -}}
-app.kubernetes.io/name: {{ include "hedera-mirror-node.name" . }}
+{{- define "hedera-services.selectorLabels" -}}
+app.kubernetes.io/name: {{ include "hedera-services.name" . }}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
 Create the name of the service account to use
 */}}
-{{- define "hedera-mirror-node.serviceAccountName" -}}
+{{- define "hedera-services.serviceAccountName" -}}
 {{- if .Values.serviceAccount.create }}
-{{- default (include "hedera-mirror-node.fullname" .) .Values.serviceAccount.name }}
+{{- default (include "hedera-services.fullname" .) .Values.serviceAccount.name }}
 {{- else }}
 {{- default "default" .Values.serviceAccount.name }}
 {{- end }}

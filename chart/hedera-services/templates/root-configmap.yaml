@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: application-root
+
+binaryData:
+
+{{ range $path, $bytes := .Files.Glob (printf "compose-network/network-node/**")}}
+{{ $name := base $path }}
+{{- sha256sum (printf "%s/%s" (index (regexSplit "compose-network/network-node" (dir $path) -1) 1 ) $name ) | indent 2 }}{{ print ": "}}{{ $.Files.Get $path | b64enc }}
+{{ end }}
