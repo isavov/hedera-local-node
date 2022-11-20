@@ -2,6 +2,8 @@ name: 'Deploy to GKE'
 
 on: workflow_dispatch
 
+concurrency:
+  group: ${{ github.workflow }}
 
 jobs:
   terraform:
