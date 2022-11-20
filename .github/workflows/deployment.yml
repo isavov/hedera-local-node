@@ -77,7 +77,7 @@ jobs:
     
     - name: Prepare and run the tests
       run: |
-         npm ci
+         npm install
          npx hardhat test --grep Smoke > output.log
          cat output.log
       working-directory: ./test/smoke
