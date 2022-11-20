@@ -66,7 +66,21 @@ jobs:
         helm upgrade --install mirror-1 ./hedera-local-node/ 
         kubectl get services -o wide
       working-directory: ./chart
-      
+
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16.x
+        cache: npm
+
+    
+    - name: Prepare and run the tests
+      run: |
+         npm ci
+         npx hardhat test --grep Smoke > output.log
+         cat output.log
+      working-directory: ./test/smoke
       
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Destroy
