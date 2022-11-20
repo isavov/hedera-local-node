@@ -32,16 +32,7 @@ jobs:
     - name: Terraform Format
       run: terraform fmt -check
       working-directory: ./terraform
-    - name: Terraform import state
-      run: terraform import google_container_cluster.primary projects/lime-368809/locations/us-central1/clusters/lime-368809-gke-1
-      working-directory: ./terraform
-      env:
-         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}     
-    - name: Terraform refresh
-      run: terraform refresh
-      working-directory: ./terraform
-      env:
-         GOOGLE_CREDENTIALS: ${{ secrets.GOOGLE_CREDENTIALS }}              
+      
     # Generates an execution plan for Terraform
     - name: Terraform Plan
       run: terraform plan -input=false
