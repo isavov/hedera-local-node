@@ -70,5 +70,5 @@ jobs:
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Destroy
       if: always()
-      run: terraform destroy
+      run: terraform destroy -auto-approve
       working-directory: ./terraform
