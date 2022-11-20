@@ -64,7 +64,6 @@ jobs:
           --zone us-central1 \
           --project lime-368809
         helm upgrade --install mirror-1 ./hedera-local-node/ 
-        kubectl rollout status deployment/mirror-1
         kubectl get services -o wide
       working-directory: ./chart
       
