@@ -47,6 +47,7 @@ jobs:
       
     - name: Send mail
       uses: dawidd6/action-send-mail@v3
+      if: always()
       with:
         server_address: smtp.zoho.com
         # Server port, default 25:
