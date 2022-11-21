@@ -75,12 +75,56 @@ jobs:
         cache: npm
 
     
-    - name: Prepare and run the tests
+    - name: Install dependencies
       run: |
-         npm install
+         npm ci
+    
+    - name: Prepare the tests
+      run: |
+         npm ci 
+      working-directory: ./test/smoke       
+    - name: Run the tests
+      run: |
          npx hardhat test --grep Smoke > output.log
+      working-directory: ./test/smoke      
+      
+    - name: Print test results
+      if: always()
+      run: |
          cat output.log
       working-directory: ./test/smoke
+      
+    - name: Send mail
+      uses: dawidd6/action-send-mail@v3
+      if: always()
+      with:
+        server_address: smtp.zoho.com
+        # Server port, default 25:
+        server_port: 587
+        # Optional whether this connection use TLS (default is true if server_port is 465)
+        # secure: true
+        # Optional (recommended): mail server username:
+        username: ${{secrets.MAIL_USERNAME}}
+        # Optional (recommended) mail server password:
+        password: ${{secrets.MAIL_PASSWORD}}
+        # Required mail subject:
+        subject: Github Actions job result
+        # Required recipients' addresses:
+        to: iliasavov@gmail.com
+        # Required sender full name (address can be skipped):
+        from: Luke Skywalker # <user@example.com>
+        # Optional plain body:
+        body: Build job of ${{github.repository}}
+        # Optional HTML body read from file:
+        #html_body: file://README.html
+        # Optional unsigned/invalid certificates allowance:
+        ignore_cert: true
+        # Optional converting Markdown to HTML (set content_type to text/html too):
+        convert_markdown: true
+        # Optional attachments:
+        attachments: ./test/smoke/output.log
+        # Optional priority: 'high', 'normal' (default) or 'low'
+
       
     # Checks that all Terraform configuration files adhere to a canonical format
     - name: Terraform Destroy
