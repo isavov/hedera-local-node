@@ -1,6 +1,6 @@
 name: 'Deploy to GKE'
 
-on: workflow_dispatch
+on: [workflow_dispatch, repository_dispatch]
 
 concurrency:
   group: ${{ github.workflow }}
