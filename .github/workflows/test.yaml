@@ -1,0 +1,34 @@
+name: 'Deploy to GKE'
+
+on: workflow_dispatch
+jobs:
+  test:
+    name: 'Test'
+    runs-on: ubuntu-latest
+    environment: production
+
+    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+    # Checkout the repository to the GitHub Actions runner
+    - name: Checkout
+      uses: actions/checkout@v3
+
+
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16.x
+        cache: npm
+
+    
+    - name: Prepare and run the tests
+      run: |
+         npm install
+         npx hardhat test --grep Smoke > output.log
+         cat output.log
+      working-directory: ./test/smoke
