@@ -1,4 +1,4 @@
-name: 'Deploy to GKE'
+name: 'Test'
 
 on: workflow_dispatch
 jobs:
