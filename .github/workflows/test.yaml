@@ -37,5 +37,11 @@ jobs:
     - name: Run the tests
       run: |
          npx hardhat test --grep Smoke > output.log
-         cat output.log
       working-directory: ./test/smoke      
+      
+    - name: Print test results
+      if: always()
+      run: |
+         cat output.log
+      working-directory: ./test/smoke            
+      
