@@ -26,9 +26,12 @@ jobs:
         cache: npm
 
     
-    - name: Prepare and run the tests
+    - name: Prepare the tests
       run: |
          npm install
+      
+    - name: Run the tests
+      run: |
          npx hardhat test --grep Smoke > output.log
          cat output.log
-      working-directory: ./test/smoke
+      working-directory: ./test/smoke      
