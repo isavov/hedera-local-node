@@ -28,7 +28,7 @@ jobs:
     
     - name: Prepare the tests
       run: |
-         npm install
+         npm ci
       
     - name: Run the tests
       run: |
