@@ -52,24 +52,24 @@ module.exports = class HederaUtils {
     const client = HederaSDK.Client.forNetwork({
       [`${host}:50211`]: "0.0.3",
     }).setOperator(
-        "0.0.2",
-        "302e020100300506032b65700422042091132178e72057a1d7528025956fe39b0b847f200ab59b2fdd367017f3087137"
+      "0.0.2",
+      "302e020100300506032b65700422042091132178e72057a1d7528025956fe39b0b847f200ab59b2fdd367017f3087137"
     );
 
     const feesFileId = 111;
     const queryFees = new HederaSDK.FileContentsQuery()
-        .setFileId(`0.0.${feesFileId}`);
+      .setFileId(`0.0.${feesFileId}`);
     const fees = (await queryFees.execute(client)).toString('hex');
     await shell.exec(
-        `docker exec mirror-node-db psql mirror_node -U mirror_node -c "INSERT INTO public.file_data(file_data, consensus_timestamp, entity_id, transaction_type) VALUES (decode('${fees}', 'hex'), ${timestamp + '000000'}, ${feesFileId}, 17);" >> ${NodeController.getNullOutput()}`
+      `docker exec mirror-node-db psql mirror_node -U mirror_node -c "INSERT INTO public.file_data(file_data, consensus_timestamp, entity_id, transaction_type) VALUES (decode('${fees}', 'hex'), ${timestamp + '000000'}, ${feesFileId}, 17);" >> ${NodeController.getNullOutput()}`
     );
 
     const exchangeRatesFileId = 112;
     const queryExchangeRates = new HederaSDK.FileContentsQuery()
-        .setFileId(`0.0.${exchangeRatesFileId}`);
+      .setFileId(`0.0.${exchangeRatesFileId}`);
     const exchangeRates = (await queryExchangeRates.execute(client)).toString('hex');
     await shell.exec(
-        `docker exec mirror-node-db psql mirror_node -U mirror_node -c "INSERT INTO public.file_data(file_data, consensus_timestamp, entity_id, transaction_type) VALUES (decode('${exchangeRates}', 'hex'), ${timestamp + '000001'}, ${exchangeRatesFileId}, 17);" >> ${NodeController.getNullOutput()}`
+      `docker exec mirror-node-db psql mirror_node -U mirror_node -c "INSERT INTO public.file_data(file_data, consensus_timestamp, entity_id, transaction_type) VALUES (decode('${exchangeRates}', 'hex'), ${timestamp + '000001'}, ${exchangeRatesFileId}, 17);" >> ${NodeController.getNullOutput()}`
     );
   }
 
@@ -77,7 +77,7 @@ module.exports = class HederaUtils {
     const LOG_SEARCH_TEXT = 'Created TOPIC entity';
 
     return new Promise((resolve, reject) => {
-      const command = shell.exec(`docker logs mirror-node-monitor -f`, {silent: true, async: true})
+      const command = shell.exec(`docker logs mirror-node-monitor -f`, { silent: true, async: true })
       command.stdout.on('data', (data) => {
         if (data.indexOf(LOG_SEARCH_TEXT) !== -1) {
           command.kill('SIGINT');
@@ -117,8 +117,7 @@ module.exports = class HederaUtils {
       const getReceipt = await tx.getReceipt(client);
 
       logger.log(
-        `| ${getReceipt.accountId.toString()} - ${
-          wallet._signingKey().privateKey
+        `| ${getReceipt.accountId.toString()} - ${wallet._signingKey().privateKey
         } - ${HederaSDK.Hbar.fromTinybars(10000000000000)} |`
       );
     }
@@ -163,8 +162,7 @@ module.exports = class HederaUtils {
       }).execute(client);
 
       logger.log(
-        `| ${accountInfo.accountId.toString()} - ${wallet.address} - ${
-          wallet._signingKey().privateKey
+        `| ${accountInfo.accountId.toString()} - ${wallet.address} - ${wallet._signingKey().privateKey
         } - ${new HederaSDK.Hbar(10000)} |`
       );
     }
@@ -205,8 +203,7 @@ module.exports = class HederaUtils {
       const getReceipt = await tx.getReceipt(client);
 
       logger.log(
-        `| ${getReceipt.accountId.toString()} - ${
-          wallet._signingKey().privateKey
+        `| ${getReceipt.accountId.toString()} - ${wallet._signingKey().privateKey
         } - ${HederaSDK.Hbar.fromTinybars(10000000000000)} |`
       );
     }
