@@ -60,9 +60,11 @@ module.exports = class HederaUtils {
       "|------------------------------------------------------------------------------------------|"
     );
     for (let i = 0; i < num; i++) {
-      let wallet = hethers.Wallet.createRandom();
+      let wallet;
       if (startup && this.privateKeysECDSA[i]) {
         wallet = new hethers.Wallet(this.privateKeysECDSA[i]);
+      } else {
+        wallet = hethers.Wallet.createRandom();
       }
       const tx = await new HederaSDK.AccountCreateTransaction()
         .setKey(
@@ -75,8 +77,7 @@ module.exports = class HederaUtils {
       const getReceipt = await tx.getReceipt(client);
 
       logger.log(
-        `| ${getReceipt.accountId.toString()} - ${
-          wallet._signingKey().privateKey
+        `| ${getReceipt.accountId.toString()} - ${wallet._signingKey().privateKey
         } - ${HederaSDK.Hbar.fromTinybars(10000000000000)} |`
       );
     }
@@ -99,9 +100,11 @@ module.exports = class HederaUtils {
       "|--------------------------------------------------------------------------------------------------------------------------------------|"
     );
     for (let i = 0; i < num; i++) {
-      let wallet = ethers.Wallet.createRandom();
+      let wallet;
       if (startup && this.privateKeysAliasECDSA[i]) {
         wallet = new ethers.Wallet(this.privateKeysAliasECDSA[i]);
+      } else {
+        let wallet = ethers.Wallet.createRandom();
       }
 
       let accountId = HederaSDK.PublicKey.fromString(
@@ -121,8 +124,7 @@ module.exports = class HederaUtils {
       }).execute(client);
 
       logger.log(
-        `| ${accountInfo.accountId.toString()} - ${wallet.address} - ${
-          wallet._signingKey().privateKey
+        `| ${accountInfo.accountId.toString()} - ${wallet.address} - ${wallet._signingKey().privateKey
         } - ${new HederaSDK.Hbar(10000)} |`
       );
     }
@@ -145,12 +147,14 @@ module.exports = class HederaUtils {
       "|------------------------------------------------------------------------------------------|"
     );
     for (let i = 0; i < num; i++) {
-      let wallet = hethers.Wallet.createRandom({ isED25519Type: true });
+      let wallet;
       if (startup && this.privateKeysED25519[i]) {
         wallet = new hethers.Wallet({
           privateKey: this.privateKeysED25519[i],
           isED25519Type: true,
         });
+      } else {
+        wallet = hethers.Wallet.createRandom({ isED25519Type: true });
       }
       const tx = await new HederaSDK.AccountCreateTransaction()
         .setKey(
@@ -163,8 +167,7 @@ module.exports = class HederaUtils {
       const getReceipt = await tx.getReceipt(client);
 
       logger.log(
-        `| ${getReceipt.accountId.toString()} - ${
-          wallet._signingKey().privateKey
+        `| ${getReceipt.accountId.toString()} - ${wallet._signingKey().privateKey
         } - ${HederaSDK.Hbar.fromTinybars(10000000000000)} |`
       );
     }
@@ -174,6 +177,10 @@ module.exports = class HederaUtils {
   }
 
   static async generateAccounts(logger, num = 10, startup = false, host = "127.0.0.1") {
+    if (num == "init") {
+      num = 10;
+      startup = true;
+    }
     const client = HederaSDK.Client.forNetwork({
       [`${host}:50211`]: "0.0.3",
     }).setOperator(

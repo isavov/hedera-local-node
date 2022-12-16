@@ -10,8 +10,21 @@ const stream = require('stream');
 const constants = require('./src/utils/constants');
 const DockerCheck = require("./src/helpers/dockerCheck");
 const CliOptions = require('./src/utils/cliOptions');
+const { argv } = require("process");
 
 yargs(hideBin(process.argv))
+  .command("configure",
+    "Applies configuration",
+    (yargs) => {
+      CliOptions.addHostOption(yargs);
+      CliOptions.addNetworkOption(yargs);
+      CliOptions.addRateLimitOption(yargs);
+      CliOptions.addDevModeOption(yargs);
+    },
+    async (argv) => {
+      await NodeController.applyConfig(argv.network, argv.limits, argv.dev);
+    }
+  )
   .command(
     "start [accounts]",
     "Starts the local hedera network.",
@@ -33,6 +46,13 @@ yargs(hideBin(process.argv))
     "Stops the local hedera network and delete all the existing data.",
     async () => {
       await NodeController.stopLocalNode();
+    }
+  )
+  .command(
+    "graceful-stop",
+    "Stops the local hedera network gracefully and saves the existing data.",
+    async () => {
+      await NodeController.gracefulStopLocalNode();
     }
   )
   .command(
@@ -63,14 +83,14 @@ yargs(hideBin(process.argv))
     }
   )
   .command(
-      "debug [timestamp]",
-      "Parses and prints the contents of the record file that has been created during the selected timestamp.",
-      (yargs) => {
-        CliOptions.addTimestampOption(yargs);
-      },
-      async (argv) => {
-        await HederaUtils.debug(console, argv.timestamp);
-      }
+    "debug [timestamp]",
+    "Parses and prints the contents of the record file that has been created during the selected timestamp.",
+    (yargs) => {
+      CliOptions.addTimestampOption(yargs);
+    },
+    async (argv) => {
+      await HederaUtils.debug(console, argv.timestamp);
+    }
   )
   .demandCommand()
   .strictCommands()
@@ -99,9 +119,9 @@ async function main(accounts, detached, host) {
   const mirrorNodeId = await DockerCheck.getContainerId(constants.MIRROR_NODE_LABEL);
   const relayId = await DockerCheck.getContainerId(constants.RELAY_LABEL);
 
-  attachContainerLogs(consensusNodeId,eventLogger);
-  attachContainerLogs(relayId,relayLogger);
-  attachContainerLogs(mirrorNodeId,mirrorNodeLogger);
+  attachContainerLogs(consensusNodeId, eventLogger);
+  attachContainerLogs(relayId, relayLogger);
+  attachContainerLogs(mirrorNodeId, mirrorNodeLogger);
 
   let i = 0;
   while (i++ < Number.MAX_VALUE) {
@@ -121,9 +141,9 @@ function attachContainerLogs(containerId, logger) {
   const container = docker.getContainer(containerId)
 
   let logStream = new stream.PassThrough();
-  logStream.on('data', function(chunk){
+  logStream.on('data', function (chunk) {
     let line = chunk.toString('utf8');
-    if (!line.includes(' Transaction ID: 0.0.2-')){
+    if (!line.includes(' Transaction ID: 0.0.2-')) {
       logger.log(line);
     }
   });
@@ -133,12 +153,12 @@ function attachContainerLogs(containerId, logger) {
     stdout: true,
     stderr: true,
     since: Date.now() / 1000
-  }, function(err, stream){
-    if(err) {
+  }, function (err, stream) {
+    if (err) {
       return console.error(err.message);
     }
     container.modem.demuxStream(stream, logStream, logStream);
-    stream.on('end', function(){
+    stream.on('end', function () {
       logStream.end('!stop!');
     });
   });
@@ -152,7 +172,7 @@ async function start(accounts, host, eventLogger, accountLogger) {
   await ConnectionCheck.waitForFiringUp(5600, eventLogger, host);
   await ConnectionCheck.waitForFiringUp(50211, console, host);
   eventLogger.log("Starting the network...");
-    
+
   accountLogger.log("Generating accounts...");
   await HederaUtils.generateAccounts(accountLogger, accounts, true, host);
 }
@@ -168,7 +188,9 @@ async function startDetached(accounts, host) {
   console.log("Starting the network...");
 
   console.log("Generating accounts...");
+  console.time('generate');
   await HederaUtils.generateAccounts(console, accounts, true, host);
+  console.timeEnd('generate');
   console.log("\nLocal node has been successfully started in detached mode.");
   process.exit();
 }

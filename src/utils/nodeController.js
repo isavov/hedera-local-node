@@ -13,11 +13,30 @@ module.exports = class NodeController {
     return "/dev/null";
   }
 
+  static async gracefulStopLocalNode() {
+    const nullOutput = this.getNullOutput();
+    shell.cd(__dirname);
+
+    console.log("Freezing the consensus node...");
+    shell.cd(__dirname);
+    var delay = 10;
+    var currentTime = new Date();
+    var freezeTime = new Date(currentTime.getTime() + (1000 * delay));
+    var freezeTimeStr = freezeTime.toUTCString();
+    freeze_log = shell.exec(`docker run -it --rm -v yahcli-config:/launch gcr.io/hedera-registry/yahcli:0.3.1 -n localhost -p 2 -v DEBUG freeze --start-time {$freezeTimeStr}`).stdout;
+    console.log(freeze_log)
+    console.log("Stopping the docker containers...");
+    shell.exec(`docker-compose stop 2>${nullOutput}`);
+    shell.cd(rootPath);
+
+  }
+
   static async stopLocalNode() {
     const nullOutput = this.getNullOutput();
     console.log("Stopping the network...");
     shell.cd(__dirname);
     console.log("Stopping the docker containers...");
+    shell.exec(`docker-compose kill 2>${nullOutput}`);
     shell.exec(`docker-compose down -v 2>${nullOutput}`);
     console.log("Cleaning the volumes and temp files...");
     shell.exec(`rm -rf network-logs/* >${nullOutput} 2>&1`);
@@ -79,7 +98,7 @@ module.exports = class NodeController {
     NodeController.setEnvValue(`${baseFolder}/.env`, 'RELAY_RATE_LIMIT_DISABLED', relayRateLimitDisabled);
     NodeController.setEnvValue(`${baseFolder}/.env`, 'DEV_MODE', devMode);
 
-    if(result.code !== 0) {
+    if (result.code !== 0) {
       shell.echo('Failed to apply config')
       shell.exit(result.code)
     } else {

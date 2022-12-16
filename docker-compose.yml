@@ -9,7 +9,7 @@ services:
     network_mode: none
 
   network-node:
-    image: "${NETWORK_NODE_IMAGE_PREFIX}${NETWORK_NODE_IMAGE_NAME}:${NETWORK_NODE_IMAGE_TAG}"
+    image: "cabob/hedera-services:v0.32.0-alpha.5-75-g5eaad2ad7c-dirty"
     container_name: network-node
     user: root
     mem_swappiness: 0
@@ -20,7 +20,13 @@ services:
       JAVA_HEAP_MAX: "${PLATFORM_JAVA_HEAP_MAX}"
       JAVA_OPTS: "${PLATFORM_JAVA_OPTS}"
     healthcheck:
-      test: ["CMD", "grep", "ServicesMain - Now current platform status = ACTIVE", "/opt/hgcapp/services-hedera/HapiApp2.0/output/hgcaa.log"]
+      test:
+        [
+          "CMD",
+          "grep",
+          "Now current platform status = ACTIVE",
+          "/opt/hedera/services/output/hgcaa.log"
+        ]
       interval: 30s
       timeout: 10s
       retries: 10
@@ -37,19 +43,18 @@ services:
       - "50211:50211"
       - "50212:50212"
     volumes:
+      - "${APPLICATION_CONFIG_PATH}:/opt/hedera/services/config-mount"
       - "${NETWORK_NODE_LOGS_ROOT_PATH}/accountBalances:/opt/hgcapp/accountBalances"
       - "${NETWORK_NODE_LOGS_ROOT_PATH}/recordStreams:/opt/hgcapp/recordStreams"
-      - "${APPLICATION_CONFIG_PATH}:/opt/hgcapp/services-hedera/HapiApp2.0/data/config"
-      - "${NETWORK_NODE_LOGS_ROOT_PATH}/logs:/opt/hgcapp/services-hedera/HapiApp2.0/output"
-      - "${APPLICATION_ROOT_PATH}/data/keys:/opt/hgcapp/services-hedera/HapiApp2.0/data/keys"
-      - "${APPLICATION_ROOT_PATH}/data/onboard:/opt/hgcapp/services-hedera/HapiApp2.0/data/onboard"
-      - "${NETWORK_NODE_LOGS_ROOT_PATH}/stats:/opt/hgcapp/services-hedera/HapiApp2.0/data/stats"
-      - "${APPLICATION_ROOT_PATH}/config.txt:/opt/hgcapp/services-hedera/HapiApp2.0/config.txt"
-      - "${APPLICATION_ROOT_PATH}/settings.txt:/opt/hgcapp/services-hedera/HapiApp2.0/settings.txt"
-      - "${APPLICATION_ROOT_PATH}/log4j2.xml:/opt/hgcapp/services-hedera/HapiApp2.0/log4j2.xml"
-      - "${APPLICATION_ROOT_PATH}/hedera.crt:/opt/hgcapp/services-hedera/HapiApp2.0/hedera.crt"
-      - "${APPLICATION_ROOT_PATH}/hedera.key:/opt/hgcapp/services-hedera/HapiApp2.0/hedera.key"
-      - "${RECORD_PARSER_ROOT_PATH}:/opt/hgcapp/recordParser"
+      - "${NETWORK_NODE_LOGS_ROOT_PATH}/logs:/opt/hedera/services/services/output"
+      - "${APPLICATION_ROOT_PATH}/data/keys:/opt/hedera/services/data/keys"
+      - "${APPLICATION_ROOT_PATH}/data/onboard:/opt/hedera/services/data/onboard"
+      - "${NETWORK_NODE_LOGS_ROOT_PATH}/stats:/opt/hedera/services/data/stats"
+      - "${APPLICATION_ROOT_PATH}/config.txt:/opt/hedera/services/config.txt"
+      - "${APPLICATION_ROOT_PATH}/settings.txt:/opt/hedera/services/settings.txt"
+      - "${APPLICATION_ROOT_PATH}/log4j2.xml:/opt/hedera/services/log4j2.xml"
+      - "${APPLICATION_ROOT_PATH}/hedera.crt:/opt/hedera/services/hedera.crt"
+      - "${APPLICATION_ROOT_PATH}/hedera.key:/opt/hedera/services/hedera.key"
 
   record-streams-uploader:
     image: "${UPLOADER_IMAGE_PREFIX}uploader-mirror:${UPLOADER_IMAGE_TAG}"
@@ -126,7 +131,7 @@ services:
       - --s3-endpoint
       - http://minio:9000
       - --debug
-      
+
   record-sidecar-uploader:
     image: "${UPLOADER_IMAGE_PREFIX}uploader-mirror:${UPLOADER_IMAGE_TAG}"
     container_name: record-sidecar-uploader
@@ -273,7 +278,7 @@ services:
     tty: false
 
   explorer:
-    container_name:  hedera-explorer
+    container_name: hedera-explorer
     image: "${MIRROR_NODE_EXPLORER_IMAGE_PREFIX}hedera-mirror-node-explorer:${MIRROR_NODE_EXPLORER_IMAGE_TAG}"
     restart: "unless-stopped"
     ports:
