@@ -1,0 +1,29 @@
+version: "2.4"
+services:
+  network-node:
+    image: "cabob/hedera-services:v0.32.0-alpha.5-122-g5c03459a3e-dirty"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "grep",
+          "Now current platform status = ACTIVE",
+          "/opt/hedera/services/output/hgcaa.log"
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 10s
+    volumes:
+      - "${APPLICATION_CONFIG_PATH}:/opt/hedera/services/config-mount"
+      - "${NETWORK_NODE_LOGS_ROOT_PATH}/accountBalances:/opt/hgcapp/accountBalances"
+      - "${NETWORK_NODE_LOGS_ROOT_PATH}/recordStreams:/opt/hgcapp/recordStreams"
+      - "${NETWORK_NODE_LOGS_ROOT_PATH}/logs:/opt/hedera/services/services/output"
+      - "${APPLICATION_ROOT_PATH}/data/keys:/opt/hedera/services/data/keys"
+      - "${APPLICATION_ROOT_PATH}/data/onboard:/opt/hedera/services/data/onboard"
+      - "${NETWORK_NODE_LOGS_ROOT_PATH}/stats:/opt/hedera/services/data/stats"
+      - "${APPLICATION_ROOT_PATH}/config.txt:/opt/hedera/services/config.txt"
+      - "${APPLICATION_ROOT_PATH}/settings.txt:/opt/hedera/services/settings.txt"
+      - "${APPLICATION_ROOT_PATH}/log4j2.xml:/opt/hedera/services/log4j2.xml"
+      - "${APPLICATION_ROOT_PATH}/hedera.crt:/opt/hedera/services/hedera.crt"
+      - "${APPLICATION_ROOT_PATH}/hedera.key:/opt/hedera/services/hedera.key"

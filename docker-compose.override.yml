@@ -1,0 +1,11 @@
+version: "2.4"
+services:
+  network-node:
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "grep",
+          "Now current platform status = ACTIVE",
+          "/opt/hgcapp/services-hedera/HapiApp2.0/output/hgcaa.log"
+        ]
