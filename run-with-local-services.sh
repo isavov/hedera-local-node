@@ -12,4 +12,4 @@ echo -e "\e[1;31mThen, press any key to continue...\e[0m"; read -k1 -s
 echo -e "\e[1;32m>Running other services\e[0m"
 docker-compose up -d
 echo -e "\e[1;32m>Generating accounts\e[0m"
-node cli.js generate-accounts
+node cli.js generate-accounts init

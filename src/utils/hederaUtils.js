@@ -218,6 +218,10 @@ module.exports = class HederaUtils {
     startup = false,
     host = "127.0.0.1"
   ) {
+    if (num == "init") {
+      num = 10;
+      startup = true;
+    }
     const client = HederaSDK.Client.forNetwork({
       [`${host}:50211`]: "0.0.3",
     }).setOperator(
