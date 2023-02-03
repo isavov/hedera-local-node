@@ -16,12 +16,12 @@
         H---J["grpc\nhedera-mirror-grpc"]
         H---K["web3\nhedera-mirror-web3"]
         L["monitor\nhedera-mirror-monitor"]
-        J<---L
-        I<---L
+        J<----L
+        I<----L
         L--sends transactions-->A
-        R[relay\nhedera-json-rpc-relay]-->I
-        R--->A
-        T(hardhat)-->R
+        R[relay\nhedera-json-rpc-relay]--check result-->I
+        R--submit transaction--->A
+        T(hardhat)--submit a transcation-->R
         
         
 ```
