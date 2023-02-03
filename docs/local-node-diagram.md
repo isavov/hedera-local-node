@@ -20,7 +20,7 @@
         I<---L
         L--sends transactions-->A
         R[relay\nhedera-json-rpc-relay]-->I
-        R-->A
+        R--->A
         T(hardhat)-->R
         
         
