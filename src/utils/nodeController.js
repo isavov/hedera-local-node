@@ -26,7 +26,7 @@ module.exports = class NodeController {
     shell.cd(rootPath);
   }
 
-  static async startLocalNode(network, limits, devMode, fullMode) {
+  static async startLocalNode(network, limits, devMode, fullMode, multiNode) {
     await this.applyConfig(network, limits, devMode, fullMode);
 
     const dockerStatus = await DockerCheck.checkDocker();
@@ -40,9 +40,17 @@ module.exports = class NodeController {
     shell.cd(__dirname);
     shell.cd("../../");
     const dockerComposeUpCmd = () => {
-      return (fullMode)
-          ? shell.exec(`docker compose up -d 2>${nullOutput}`)
-          : shell.exec(`docker compose -f docker-compose.yml -f docker-compose.evm.yml up -d 2>${nullOutput}`);
+      var composeFiles = ['docker-compose.yml'];
+      if (!fullMode) {
+        composeFiles.push('docker-compose.evm.yml');
+      }
+      if (multiNode) {
+        composeFiles.push('docker-compose.multinode.yml');
+        if (!fullMode) {
+          composeFiles.push('docker-compose.multinode.evm.yml');
+        }
+      }
+      return shell.exec(`docker compose -f ${composeFiles.join(' -f ')} up -d 2>${nullOutput}`);
     };
     const output = dockerComposeUpCmd();
     if (output.code == 1) {
@@ -109,8 +117,8 @@ module.exports = class NodeController {
       const fs = require("fs");
       const application = yaml.load(fs.readFileSync(`${baseFolder}/compose-network/mirror-node/application.yml`));
       application.hedera.mirror.importer.dataPath = 'file:///node/';
-      application.hedera.mirror.importer.downloader.sources = [{type: 'LOCAL'}];
-      fs.writeFileSync(`${baseFolder}/compose-network/mirror-node/application.yml`, yaml.dump(application, {lineWidth: 256}));
+      application.hedera.mirror.importer.downloader.sources = [{ type: 'LOCAL' }];
+      fs.writeFileSync(`${baseFolder}/compose-network/mirror-node/application.yml`, yaml.dump(application, { lineWidth: 256 }));
     }
   }
 

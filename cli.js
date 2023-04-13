@@ -24,9 +24,10 @@ yargs(hideBin(process.argv))
       CliOptions.addDevModeOption(yargs);
       CliOptions.addFullModeOption(yargs);
       CliOptions.addBalanceOption(yargs);
+      CliOptions.addMultiNodeOption(yargs);
     },
     async (argv) => {
-      await NodeController.startLocalNode(argv.network, argv.limits, argv.dev, argv.full);
+      await NodeController.startLocalNode(argv.network, argv.limits, argv.dev, argv.full, argv.multinode);
       await main(argv.accounts, argv.balance, argv.detached, argv.host);
     }
   )
@@ -49,10 +50,11 @@ yargs(hideBin(process.argv))
       CliOptions.addDevModeOption(yargs);
       CliOptions.addFullModeOption(yargs);
       CliOptions.addBalanceOption(yargs);
+      CliOptions.addMultiNodeOption(yargs);
     },
     async (argv) => {
       await NodeController.stopLocalNode();
-      await NodeController.startLocalNode(argv.network, argv.limits, argv.dev, argv.full);
+      await NodeController.startLocalNode(argv.network, argv.limits, argv.dev, argv.full, argv.multinode);
       await main(argv.accounts, argv.balance, argv.detached, argv.host);
     }
   )
