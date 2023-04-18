@@ -1,6 +1,5 @@
 services:
   record-streams-uploader:
-    &record-streams-uploader
     restart: "no"
     entrypoint: [
       "echo",
@@ -12,14 +11,7 @@ services:
       "This container is intentionally disabled by the EVM profile."
     ]
     command: []
-
-  record-streams-uploader-1: *record-streams-uploader
-
-  record-streams-uploader-2: *record-streams-uploader
-
-  record-streams-uploader-3: *record-streams-uploader
   account-balances-uploader:
-    &account-balances-uploader
     restart: "no"
     entrypoint: [
       "echo",
@@ -31,14 +23,7 @@ services:
       "This container is intentionally disabled by the EVM profile."
     ]
     command: []
-
-  account-balances-uploader-1: *account-balances-uploader
-
-  account-balances-uploader-2: *account-balances-uploader
-
-  account-balances-uploader-3: *account-balances-uploader
   record-sidecar-uploader:
-    &record-sidecar-uploader
     restart: "no"
     entrypoint: [
       "echo",
@@ -50,19 +35,11 @@ services:
       "This container is intentionally disabled by the EVM profile."
     ]
     command: []
-
-  record-sidecar-uploader-1: *record-sidecar-uploader
-
-  record-sidecar-uploader-2: *record-sidecar-uploader
-
-  record-sidecar-uploader-3: *record-sidecar-uploader
-
   minio:
     restart: "no"
     entrypoint: [ "echo", "This container is intentionally disabled by the EVM profile." ]
     command: []
   importer:
     volumes:
-      - "${NETWORK_NODE_LOGS_ROOT_PATH}/accountBalances/:/node/streams/accountBalances/"
-      - "${NETWORK_NODE_LOGS_ROOT_PATH}/recordStreams/:/node/streams/recordstreams/"
-    #comment
+      - "${NETWORK_NODE_LOGS_ROOT_PATH}/accountBalances/balance0.0.3:/node/streams/accountBalances/balance0.0.3"
+      - "${NETWORK_NODE_LOGS_ROOT_PATH}/recordStreams/record0.0.3:/node/streams/recordstreams/record0.0.3"
