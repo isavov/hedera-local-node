@@ -388,7 +388,8 @@ services:
       - "50213:50213"
     volumes:
       - ./envoy.yaml:/etc/envoy/envoy.yaml
-    
+    networks:
+      - network-node-bridge
 
   prometheus:
     image: "${PROMETHEUS_IMAGE_NAME}:${PROMETHEUS_IMAGE_TAG}"
