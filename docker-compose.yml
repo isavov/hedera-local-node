@@ -384,8 +384,9 @@ services:
       - "50213:50213"
     volumes:
       - ./envoy.yaml:/etc/envoy/envoy.yaml
-    networks:
-      - network-node-bridge
+     networks:
+      network-node-bridge:
+        ipv4_address: 172.27.0.14
 
   prometheus:
     image: "${PROMETHEUS_IMAGE_NAME}:${PROMETHEUS_IMAGE_TAG}"
