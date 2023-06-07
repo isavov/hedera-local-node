@@ -32,12 +32,15 @@ jobs:
 
       - name: Start the local node with testnet images
         run: node cli.js start --network ${{ matrix.network }} -d
-
+      - name: Docker pretest check
+        run: docker compose logs
       - name: Prepare and run the tests
         run: |
           cd test/smoke
           npm ci
           npx hardhat test --grep Smoke
-
+      - name: Docker posttest check
+        if: always()
+        run: docker compose logs
       - name: Stop the local node
         run: node cli.js stop
