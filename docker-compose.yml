@@ -347,12 +347,8 @@ services:
       network-node:
         condition: service_started
     networks:
-      mirror-node:
-        aliases:
-          - "json-rpc-relay"
-          - "relay"
-      network-node-bridge:
-        ipv4_address: 172.27.0.14
+      - mirror-node
+      - network-node-bridge
     environment:
       HEDERA_NETWORK: "${RELAY_HEDERA_NETWORK}"
       OPERATOR_ID_MAIN: "${RELAY_OPERATOR_ID_MAIN}"
