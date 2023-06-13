@@ -372,6 +372,7 @@ services:
       DEV_MODE: "${RELAY_DEV_MODE}"
       INPUT_SIZE_LIMIT: "${RELAY_INPUT_SIZE_LIMIT}"
       RATE_LIMIT_DISABLED: "${RELAY_RATE_LIMIT_DISABLED}"
+      ETH_CALL_DEFAULT_TO_CONSENSUS_NODE: false
     ports:
       - "7546:7546"
     restart: unless-stopped
@@ -393,7 +394,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./compose-network/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus-data:/prometheus
+      - ./compose-network/prometheus/prometheus:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
@@ -419,6 +420,18 @@ services:
     networks:
       network-node-bridge:
         ipv4_address: 172.27.0.5
+
+    environment:
+      GF_RENDERING_SERVER_URL: http://renderer:8081/render
+      GF_RENDERING_CALLBACK_URL: http://grafana:3000/
+      GF_LOG_FILTERS: rendering:debug
+  renderer:
+    image: grafana/grafana-image-renderer:latest
+    ports:
+      - 8081
+    networks:
+      network-node-bridge:
+
 
 networks:
   network-node-bridge:
