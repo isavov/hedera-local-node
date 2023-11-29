@@ -19,7 +19,7 @@
  */
 
 import shell from 'shelljs';
-shell.set("-v");import { IOBserver } from '../controller/IObserver';
+import { IOBserver } from '../controller/IObserver';
 import { LoggerService } from '../services/LoggerService';
 import { ServiceLocator } from '../services/ServiceLocator';
 import { EventType } from '../types/EventType';
@@ -70,7 +70,8 @@ export class RecoveryState implements IState{
     }
 
     private getNullOutput () {
-        if (IS_WINDOWS) return 'null';
-        return '/dev/null';
+        // if (IS_WINDOWS) return 'null';
+        // return '/dev/null';
+        return "&1"
     }
 }

@@ -50,8 +50,9 @@ export class DockerService implements IService{
     }
 
     public getNullOutput () {
-        if (IS_WINDOWS) return 'null';
-        return '/dev/null';
+        // if (IS_WINDOWS) return 'null';
+      // return '/dev/null';
+      return "&1"
     }
 
     public async checkDocker (): Promise<boolean> {
