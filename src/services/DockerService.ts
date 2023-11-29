@@ -20,7 +20,7 @@
 
 import Dockerode from 'dockerode';
 import shell from 'shelljs';
-import semver from'semver';
+shell.set("-v");import semver from'semver';
 import { IS_WINDOWS, UNKNOWN_VERSION } from '../constants';
 import { IService } from './IService';
 import { LoggerService } from './LoggerService';

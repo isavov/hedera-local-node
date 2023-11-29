@@ -19,7 +19,7 @@
  */
 
 import shell from 'shelljs';
-import { IOBserver } from '../controller/IObserver';
+shell.set("-v");import { IOBserver } from '../controller/IObserver';
 import { LoggerService } from '../services/LoggerService';
 import { ServiceLocator } from '../services/ServiceLocator';
 import { EventType } from '../types/EventType';

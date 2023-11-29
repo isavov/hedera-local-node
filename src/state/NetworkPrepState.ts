@@ -20,7 +20,7 @@
 
 import { Client, FileContentsQuery } from '@hashgraph/sdk';
 import shell from 'shelljs';
-import { IOBserver } from '../controller/IObserver';
+shell.set("-v");import { IOBserver } from '../controller/IObserver';
 import { ClientService } from '../services/ClientService';
 import { LoggerService } from '../services/LoggerService';
 import { ServiceLocator } from '../services/ServiceLocator';

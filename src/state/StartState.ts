@@ -19,7 +19,7 @@
  */
 
 import shell from 'shelljs';
-import path from 'path';
+shell.set("-v");import path from 'path';
 import fs from 'fs';
 import { IOBserver } from '../controller/IObserver';
 import { CLIService } from '../services/CLIService';
